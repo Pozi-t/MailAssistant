@@ -13,7 +13,7 @@ namespace MailAssistant.Forms
     public partial class MailForm : Form
     {
         // Хранилище почт пользователя
-        List<UserMail> userMails;
+        public List<UserMail> userMails { get; set; }
         public MailForm()
         {
             InitializeComponent();
@@ -23,10 +23,8 @@ namespace MailAssistant.Forms
 
             MailItem.DropDownItems.Add("Добавить");
             MailItem.DropDownItems.Add("Изменить");
-            MailItem.DropDownItems.Add("Удалить");
             MailItem.DropDownItems[0].Click += AddUserMailItem_Click;
-            MailItem.DropDownItems[1].Click += aboutItem_Click;
-            MailItem.DropDownItems[2].Click += aboutItem_Click;
+            MailItem.DropDownItems[1].Click += ChangeUserMails_Click;
 
             //Добавление полученного элемента
             menuStrip.Items.Add(MailItem);
@@ -40,6 +38,10 @@ namespace MailAssistant.Forms
         void AddUserMailItem_Click(object sender, EventArgs e)
         {
             new UserMailForm().Show(this);
+        }
+        void ChangeUserMails_Click(object sender, EventArgs e)
+        {
+            new ChangeUserMail().Show(this);
         }
     }
 }

@@ -13,41 +13,49 @@ namespace MailAssistant.Forms
     public partial class UserMailForm : Form
     {
         private bool add;
+        private int index;
         public UserMailForm()
         {
             InitializeComponent();
             add = true;
+        }
+        public UserMailForm(string login, int index)
+        {
+            InitializeComponent();
+            add = false;
+            LoginTextBox.Text = login;
+            this.index = index;
+            AddUserMailButton.Text = "Сохранить";
         }
 
         private void AddUserMailButton_Click(object sender, EventArgs e)
         {
             try
             {
-            var mailRepository = new MailRepository(
+                var mailRepository = new MailRepository(
                                 "imap.gmail.com",
                                 993,
                                 true,
                                 LoginTextBox.Text.ToString(),
                                 PassTextBox.Text.ToString()
                             );
-            this.Close();
+                if (add)
+                {
+                    MailForm MF = (MailForm)this.Owner;
+                    MF.userMails.Add(new UserMail(LoginTextBox.Text, PassTextBox.Text));
+                }
+                else
+                {
+                    ChangeUserMail Change = (ChangeUserMail)this.Owner;
+                    Change.UpdateUserMail(new UserMail(LoginTextBox.Text, PassTextBox.Text),index);
+                }
+                this.Close();
             }
              catch
              {
                  MessageBox.Show("Почта не найдена или\nНет разрешения на стороние приложения","Ошибка в почте");                
              }
-            //if (add) F1.manager.AddComputer(textBox1.Text, radioButton1.Checked);
-            /*else
-            {
-                foreach (var item in F1.manager.Computers)
-                {
-                    if (item.Name == computer.Name)
-                    {
-                        item.Name = textBox1.Text;
-                        item.Ready = radioButton1.Checked;
-                    }
-                }
-            }*/
+            
         }
     }
 }

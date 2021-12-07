@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 
 namespace MailAssistant
 {
-    class UserMail
+    public class UserMail
     {
         private string login;
         private string pass;
@@ -16,15 +16,20 @@ namespace MailAssistant
         {
             get
             {
-                SecureString password = DecryptString(login);
-                string readable = ToInsecureString(password);
+                SecureString temp = DecryptString(login);
+                string readable = ToInsecureString(temp);
                 return readable;
             }
             set => login = EncryptString(ToSecureString(value));
         }
         public string Pass
         {
-            get => pass;
+            get
+            {
+                SecureString temp = DecryptString(pass);
+                string readable = ToInsecureString(temp);
+                return readable;
+            }
             set => pass = EncryptString(ToSecureString(value));
         }
         UserMail() { }
