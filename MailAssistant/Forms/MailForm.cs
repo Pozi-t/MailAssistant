@@ -12,11 +12,12 @@ namespace MailAssistant.Forms
 {
     public partial class MailForm : Form
     {
-        
+        // Хранилище почт пользователя
+        List<UserMail> userMails;
         public MailForm()
         {
             InitializeComponent();
-
+            userMails = new List<UserMail>();
             //Созание первой вкладки меню
             ToolStripMenuItem MailItem = new ToolStripMenuItem("Почты");
 
