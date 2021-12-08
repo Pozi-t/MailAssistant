@@ -80,11 +80,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DB.cs" />
     <Compile Include="Forms\ChangeUserMail.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ChangeUserMail.Designer.cs">
       <DependentUpon>ChangeUserMail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\HTMLMessageForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\HTMLMessageForm.Designer.cs">
+      <DependentUpon>HTMLMessageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MailForm.cs">
       <SubType>Form</SubType>
@@ -104,6 +111,9 @@
     <Compile Include="UserMail.cs" />
     <EmbeddedResource Include="Forms\ChangeUserMail.resx">
       <DependentUpon>ChangeUserMail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\HTMLMessageForm.resx">
+      <DependentUpon>HTMLMessageForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MailForm.resx">
       <DependentUpon>MailForm.cs</DependentUpon>

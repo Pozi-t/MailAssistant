@@ -103,6 +103,7 @@ namespace MailAssistant.Forms
             this.Controls.Add(this.label1);
             this.Name = "UserMailForm";
             this.Text = "UserMailForm";
+            this.Load += new System.EventHandler(this.UserMailForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

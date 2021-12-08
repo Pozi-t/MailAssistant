@@ -27,6 +27,10 @@ namespace MailAssistant.Forms
             this.index = index;
             AddUserMailButton.Text = "Сохранить";
         }
+        private void UserMailForm_Load(object sender, EventArgs e)
+        {
+            PassTextBox.PasswordChar = '*';
+        }
 
         private void AddUserMailButton_Click(object sender, EventArgs e)
         {
@@ -57,5 +61,6 @@ namespace MailAssistant.Forms
              }
             
         }
+
     }
 }
