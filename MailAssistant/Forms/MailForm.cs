@@ -60,13 +60,24 @@ namespace MailAssistant.Forms
         }
         private void SetInformUSerMessage()
         {
-            MessagedataGrid.Rows.Clear();
+            Action clear = () => MessagedataGrid.Rows.Clear();
+            Action action;
+            Invoke(clear);
             foreach (ActiveUp.Net.Mail.Message email in messages)
             {
-                MessagedataGrid.Rows.Add(email.Date, email.From, email.BodyText.Text);
+                action = () => MessagedataGrid.Rows.Add(email.Date, email.From, email.BodyText.Text);
+                // Свойство InvokeRequired указывает, нeжно ли обращаться к контролу с помощью Invoke
+                if (MessagedataGrid.InvokeRequired)
+                {
+                    Invoke(action);
+                }
+                else
+                {
+                    action();
+                }
             }
         }
-        private void GetUSerMessage(object obj)
+        private async void GetUSerMessage(object obj)
         {
             UserMail userMail = (UserMail)obj;
             var mailRepository = new MailRepository(
@@ -83,7 +94,7 @@ namespace MailAssistant.Forms
             {
                 MessagedataGrid.Rows.Add(email.Date, email.From, email.BodyText.Text);
             }*/
-            SetInformUSerMessage();
+            /*await Task.Run(() => */SetInformUSerMessage();
             MutexObj.ReleaseMutex();
         }
         private void UpdateMails_Click(object sender, EventArgs e)
@@ -105,7 +116,24 @@ namespace MailAssistant.Forms
         {
             try
             {
-                MessageBox.Show(MessagedataGrid.SelectedRows[0].Index.ToString(), "Ля прикол");
+                int index = MessagedataGrid.SelectedRows[0].Index;
+                string path = "index.html";
+
+                if (File.Exists(path)) File.Delete(path);
+                using (StreamWriter sw = new StreamWriter(path, false, Encoding.UTF8))
+                {
+                    sw.WriteLine(messages[index].BodyHtml.Text);
+                }
+
+                /*using (FileStream fstream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    // преобразуем строку в байты
+                    byte[] array = System.Text.Encoding.Default.GetBytes(messages[index].BodyHtml.Text);
+                    // запись массива байтов в файл
+                    fstream.Write(array, 0, array.Length);
+                }*/
+                new HTMLMessageForm(Path.GetFullPath(path)).Show(this);
+
             }
             catch { }
         }

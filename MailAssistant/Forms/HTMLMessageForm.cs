@@ -15,7 +15,12 @@ namespace MailAssistant.Forms
         public HTMLMessageForm()
         {
             InitializeComponent();
-            webBrowser1.Navigate("");
+            MessageWebBrowser.Navigate("C:\\Users\\Tikhon\\Desktop\\Универ\\semestr3\\СПЗ\\curs\\final\\MailAssistant\\MailAssistant\\bin\\Debug\\index.html");
+        }
+        public HTMLMessageForm(string fullPath)
+        {
+            InitializeComponent();
+            MessageWebBrowser.Navigate(fullPath);
         }
     }
 }

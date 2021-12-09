@@ -42,7 +42,7 @@ namespace MailAssistant.Forms
             this.menuStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip.Location = new System.Drawing.Point(0, 0);
             this.menuStrip.Name = "menuStrip";
-            this.menuStrip.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip.Size = new System.Drawing.Size(677, 24);
             this.menuStrip.TabIndex = 0;
             this.menuStrip.Text = "menuStrip1";
             // 
@@ -61,7 +61,7 @@ namespace MailAssistant.Forms
             this.MessagedataGrid.ReadOnly = true;
             this.MessagedataGrid.RowHeadersWidth = 51;
             this.MessagedataGrid.RowTemplate.Height = 24;
-            this.MessagedataGrid.Size = new System.Drawing.Size(800, 426);
+            this.MessagedataGrid.Size = new System.Drawing.Size(677, 426);
             this.MessagedataGrid.TabIndex = 1;
             this.MessagedataGrid.DoubleClick += new System.EventHandler(this.MessagedataGrid_DoubleClick);
             // 
@@ -93,7 +93,7 @@ namespace MailAssistant.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(677, 450);
             this.Controls.Add(this.MessagedataGrid);
             this.Controls.Add(this.menuStrip);
             this.MainMenuStrip = this.menuStrip;
