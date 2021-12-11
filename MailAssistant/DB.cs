@@ -3,36 +3,105 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Xml.Serialization;
-
+using System.Data.SqlClient;
+using System.Data;
+using System.Threading;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 namespace MailAssistant
 {
-    class DB
+    public class DB
     {
-        public static void Save(List<UserMail> userMails)
-        {
-            File.Delete("userMails.xml");
-            // передаем в конструктор тип класса
-            XmlSerializer formatter = new XmlSerializer(typeof(List<UserMail>));
 
-            // получаем поток, куда будем записывать сериализованный объект
-            using (FileStream fs = new FileStream("userMails.xml", FileMode.OpenOrCreate))
+        /*Создание строки подключения
+        Data Source -имя сервера, по стандарту(local)\SQLEXPRESS
+        Initial Catalog - имя БД
+        Integrated Security = -параметры безопасности */
+
+        const string connStr = @"server=localhost;
+                               user = root;
+                               password =;
+                               database = mailassistant;";
+        private string query;
+        private readonly MySqlConnection conn;
+        public DB()
+        {
+
+            /*Здесь указано имя БД (для создания БД указывать не нужно)
+              для проверки того, создана ли данная БД
+            Создаем SqlConnection и передаем ему строку подключения */
+
+            conn = new MySqlConnection(connStr);
+            try
             {
-                formatter.Serialize(fs, userMails);
+                //попытка подключения
+                conn.Open();
+            }
+            catch
+            {
+                MessageBox.Show("Не удалось подключиться к базе данных","Ошибка");
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
+
+        }
+        public void AddUsers(string login, string pass)
+        {
+            try
+            {
+                conn.Open();
+                query = $"INSERT INTO mailaccounts (login, pass) VALUES(\"{login}\",\"{pass}\");";
+
+                MySqlCommand command = new MySqlCommand(query, conn);
+                command.ExecuteNonQuery();
+
+            }
+            catch (SqlException se)
+            {
+                MessageBox.Show($"Ошибка подключения:{se.Message}", "Ошибка");
+            }
+            finally
+            {
+                //закрываем соединение
+                conn.Close();
+                //conn.Dispose();
             }
         }
-        public static void Load(out List<UserMail> userMails)
+        public void LoadUsers(ref List<UserMail> userMails)
         {
-            userMails = new List<UserMail>();
-            // передаем в конструктор тип класса
-            XmlSerializer formatter = new XmlSerializer(typeof(List<UserMail>));
-
-            using (FileStream fs = new FileStream("persons.xml", FileMode.OpenOrCreate))
+            try
             {
-                userMails = (List<UserMail>)formatter.Deserialize(fs);
+                conn.Open();
+                userMails.Clear();
+                query = $"SELECT login, pass FROM mailaccounts;";
+                MySqlDataAdapter dataAdapter = new MySqlDataAdapter(query, conn);
+                DataSet dataSet = new DataSet("mailaccounts");
+                dataAdapter.Fill(dataSet);
+                DataTable dataTable;
+                dataTable = dataSet.Tables[0];
 
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    userMails.Add(new UserMail(row[0].ToString(), row[1].ToString()));
+                }
             }
+            catch (SqlException se)
+            {
+                MessageBox.Show($"Ошибка подключения:{se.Message}", "Ошибка");
+            }
+            finally
+            {
+                //закрываем соединение
+                conn.Close();
+                conn.Dispose();
+            }
+        }
+        public void UpdateUsers(List<UserMail> userMails)
+        {
+
         }
     }
 }

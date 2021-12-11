@@ -46,7 +46,9 @@ namespace MailAssistant.Forms
                 if (add)
                 {
                     MailForm MF = (MailForm)this.Owner;
-                    MF.userMails.Add(new UserMail(LoginTextBox.Text, PassTextBox.Text));
+                    //MF.userMails.Add(new UserMail(LoginTextBox.Text, PassTextBox.Text));
+                    MF.db.AddUsers(LoginTextBox.Text,PassTextBox.Text);
+                    MF.LoadMailAccount();
                 }
                 else
                 {

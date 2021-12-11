@@ -18,9 +18,11 @@ namespace MailAssistant
             {
                 SecureString temp = DecryptString(login);
                 string readable = ToInsecureString(temp);
-                return readable;
+                return login;
+                //return readable;
             }
-            set => login = EncryptString(ToSecureString(value));
+            //set => login = EncryptString(ToSecureString(value));
+            set => login = value;
         }
         public string Pass
         {
@@ -28,9 +30,11 @@ namespace MailAssistant
             {
                 SecureString temp = DecryptString(pass);
                 string readable = ToInsecureString(temp);
-                return readable;
+                //return readable;
+                return pass;
             }
-            set => pass = EncryptString(ToSecureString(value));
+            //set => pass = EncryptString(ToSecureString(value));
+            set => pass = value;
         }
         UserMail() { }
         public UserMail(string login, string pass)

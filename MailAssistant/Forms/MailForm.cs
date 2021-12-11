@@ -17,7 +17,8 @@ namespace MailAssistant.Forms
         // Хранилище почт пользователя
         public List<UserMail> userMails;
         public List<ActiveUp.Net.Mail.Message> messages;
-        private Mutex MutexObj;
+        private readonly Mutex MutexObj;
+        public readonly DB db;
         public MailForm()
         {
             InitializeComponent();
@@ -26,6 +27,10 @@ namespace MailAssistant.Forms
             MutexObj = new Mutex();
             userMails = new List<UserMail>();
             messages = new List<ActiveUp.Net.Mail.Message>();
+            db = new DB();
+
+            // Получаем зарегестрированные акаунты гугл
+            LoadMailAccount();
             //Созание первой вкладки меню
             ToolStripMenuItem MailItem = new ToolStripMenuItem("Почты");
 
@@ -77,7 +82,7 @@ namespace MailAssistant.Forms
                 }
             }
         }
-        private async void GetUSerMessage(object obj)
+        private void GetUSerMessage(object obj)
         {
             UserMail userMail = (UserMail)obj;
             var mailRepository = new MailRepository(
@@ -137,5 +142,6 @@ namespace MailAssistant.Forms
             }
             catch { }
         }
+        public void LoadMailAccount() => db.LoadUsers(ref userMails);
     }
 }
