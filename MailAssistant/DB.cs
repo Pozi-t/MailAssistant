@@ -44,7 +44,6 @@ namespace MailAssistant
             finally
             {
                 conn.Close();
-                conn.Dispose();
             }
 
         }
@@ -67,7 +66,7 @@ namespace MailAssistant
             {
                 //закрываем соединение
                 conn.Close();
-                //conn.Dispose();
+                conn.Dispose();
             }
         }
         public void LoadUsers(ref List<UserMail> userMails)
@@ -76,7 +75,7 @@ namespace MailAssistant
             {
                 conn.Open();
                 userMails.Clear();
-                query = $"SELECT login, pass FROM mailaccounts;";
+                query = $"SELECT * FROM mailaccounts;";
                 MySqlDataAdapter dataAdapter = new MySqlDataAdapter(query, conn);
                 DataSet dataSet = new DataSet("mailaccounts");
                 dataAdapter.Fill(dataSet);
@@ -85,7 +84,7 @@ namespace MailAssistant
 
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    userMails.Add(new UserMail(row[0].ToString(), row[1].ToString()));
+                    userMails.Add(new UserMail(row[0].ToString(), row[1].ToString(), row[2].ToString()));
                 }
             }
             catch (SqlException se)
@@ -96,12 +95,52 @@ namespace MailAssistant
             {
                 //закрываем соединение
                 conn.Close();
-                conn.Dispose();
             }
         }
-        public void UpdateUsers(List<UserMail> userMails)
+        public void UpdateUsers(UserMail userMail)
         {
+            try
+            {
+                conn.Open();
+                query = $"UPDATE mailaccounts SET login = '{userMail.Login}', pass = '{userMail.Pass}' WHERE id = {userMail.Id}; ";
 
+                MySqlCommand command = new MySqlCommand(query, conn);
+                command.ExecuteNonQuery();
+
+            }
+            catch (SqlException se)
+            {
+                MessageBox.Show($"Ошибка подключения:{se.Message}", "Ошибка");
+            }
+            finally
+            {
+                //закрываем соединение
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
+        }
+        public void DeleteUsers(UserMail userMail)
+        {
+            try
+            {
+                conn.Open();
+                query = $"DELETE FROM mailaccounts WHERE id = {userMail.Id};";
+
+                MySqlCommand command = new MySqlCommand(query, conn);
+                command.ExecuteNonQuery();
+
+            }
+            catch (SqlException se)
+            {
+                MessageBox.Show($"Ошибка подключения:{se.Message}", "Ошибка");
+            }
+            finally
+            {
+                //закрываем соединение
+                conn.Close();
+            }
         }
     }
 }

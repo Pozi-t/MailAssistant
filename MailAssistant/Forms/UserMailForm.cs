@@ -14,18 +14,20 @@ namespace MailAssistant.Forms
     {
         private bool add;
         private int index;
+        private UserMail userMail;
         public UserMailForm()
         {
             InitializeComponent();
             add = true;
         }
-        public UserMailForm(string login, int index)
+        public UserMailForm(UserMail UserMail, int index)
         {
             InitializeComponent();
             add = false;
-            LoginTextBox.Text = login;
+            LoginTextBox.Text = UserMail.Login;
             this.index = index;
             AddUserMailButton.Text = "Сохранить";
+            userMail = UserMail;
         }
         private void UserMailForm_Load(object sender, EventArgs e)
         {
@@ -53,7 +55,7 @@ namespace MailAssistant.Forms
                 else
                 {
                     ChangeUserMail Change = (ChangeUserMail)this.Owner;
-                    Change.UpdateUserMail(new UserMail(LoginTextBox.Text, PassTextBox.Text),index);
+                    Change.UpdateUserMail(new UserMail(userMail.Id, LoginTextBox.Text, PassTextBox.Text),index);
                 }
                 this.Close();
             }

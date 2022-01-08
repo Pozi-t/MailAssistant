@@ -10,6 +10,7 @@ namespace MailAssistant
 {
     public class UserMail
     {
+        private string id;
         private string login;
         private string pass;
         public string Login
@@ -36,14 +37,27 @@ namespace MailAssistant
             //set => pass = EncryptString(ToSecureString(value));
             set => pass = value;
         }
-        UserMail() { }
-        public UserMail(string login, string pass)
+        public string Id
         {
+            get
+            {
+                return id;
+            }
+            set
+            {
+                id = value;
+            }
+        }
+        UserMail() { }
+        public UserMail(string id, string login, string pass)
+        {
+            Id = id;
             Login = login;
             Pass = pass;
         }
         public UserMail(UserMail userMail)
         {
+            Id = userMail.Id;
             Login = userMail.Login;
             Pass = userMail.Pass;
         }

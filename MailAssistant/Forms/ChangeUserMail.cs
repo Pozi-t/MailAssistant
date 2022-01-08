@@ -38,19 +38,23 @@ namespace MailAssistant.Forms
         }
         private void ChangeButton_Click(object sender, EventArgs e)
         {
-            new UserMailForm(MailListBox.SelectedItem.ToString(),MailListBox.SelectedIndex).Show(this);
+            MailForm MF = (MailForm)this.Owner;
+            new UserMailForm(MF.userMails[MailListBox.SelectedIndex], MailListBox.SelectedIndex).Show(this);
         }
 
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             MailForm MF = (MailForm)this.Owner;
+            MF.db.DeleteUsers(MF.userMails[MailListBox.SelectedIndex]);
             MF.userMails.RemoveAt(MailListBox.SelectedIndex);
+            MF.LoadMailAccount();
             SetMailListBox();
         }
         public void UpdateUserMail(UserMail userMail, int index)
         {
             MailForm MF = (MailForm)this.Owner;
-            MF.userMails[index] = userMail;
+            MF.db.UpdateUsers(userMail);
+            MF.LoadMailAccount();
             SetMailListBox();
         }
     }

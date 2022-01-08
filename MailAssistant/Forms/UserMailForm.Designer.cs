@@ -74,7 +74,7 @@ namespace MailAssistant.Forms
             // 
             // PassTextBox
             // 
-            this.PassTextBox.Location = new System.Drawing.Point(88, 119);
+            this.PassTextBox.Location = new System.Drawing.Point(88, 122);
             this.PassTextBox.Name = "PassTextBox";
             this.PassTextBox.Size = new System.Drawing.Size(161, 22);
             this.PassTextBox.TabIndex = 4;

@@ -42,7 +42,6 @@ namespace MailAssistant.Forms
             //Добавление полученного элемента
             menuStrip.Items.Add(MailItem);
 
-
             MailItem = new ToolStripMenuItem("Письма");
 
             MailItem.DropDownItems.Add("Обновить"); 
