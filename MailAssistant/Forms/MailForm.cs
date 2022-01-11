@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
+using ActiveUp.Net.Mail;
 
 namespace MailAssistant.Forms
 {
@@ -19,6 +20,7 @@ namespace MailAssistant.Forms
         public List<ActiveUp.Net.Mail.Message> messages;
         private readonly Mutex MutexObj;
         public readonly DB db;
+        private string whatLetters;
         public MailForm()
         {
             InitializeComponent();
@@ -31,6 +33,9 @@ namespace MailAssistant.Forms
 
             // Получаем зарегестрированные акаунты гугл
             LoadMailAccount();
+            // Получение непрочитанных писем
+            whatLetters = "Новые";
+            if(userMails.Count != 0) CreateTreadsLoadMessage();
             //Созание первой вкладки меню
             ToolStripMenuItem MailItem = new ToolStripMenuItem("Почты");
 
@@ -44,8 +49,25 @@ namespace MailAssistant.Forms
 
             MailItem = new ToolStripMenuItem("Письма");
 
-            MailItem.DropDownItems.Add("Обновить"); 
+            MailItem.DropDownItems.Add("Все");
+            MailItem.DropDownItems.Add("Новые");
             MailItem.DropDownItems[0].Click += UpdateMails_Click;
+            MailItem.DropDownItems[1].Click += NewMails_Click;
+
+            menuStrip.Items.Add(MailItem);
+
+
+            MailItem = new ToolStripMenuItem("Фильтрация");
+
+            MailItem.DropDownItems.Add("По отправителю");
+            MailItem.DropDownItems.Add("По получателю");
+            MailItem.DropDownItems.Add("Сегодняшние");
+            MailItem.DropDownItems.Add("Всe");
+
+            MailItem.DropDownItems[0].Click += ShowWithoutMails_Click;
+            MailItem.DropDownItems[1].Click += ShowFromMails_Click;
+            MailItem.DropDownItems[2].Click += ShowTodayMails_Click;
+            MailItem.DropDownItems[3].Click += ShowAllMails_Click;
 
             menuStrip.Items.Add(MailItem);
         }
@@ -69,7 +91,7 @@ namespace MailAssistant.Forms
             Invoke(clear);
             foreach (ActiveUp.Net.Mail.Message email in messages)
             {
-                action = () => MessagedataGrid.Rows.Add(email.Date, email.From, email.BodyText.Text);
+                action = () => MessagedataGrid.Rows.Add(email.From.Email,email.To[0].Email, email.Date.ToString(),email.BodyText.Text);
                 // Свойство InvokeRequired указывает, нeжно ли обращаться к контролу с помощью Invoke
                 if (MessagedataGrid.InvokeRequired)
                 {
@@ -81,6 +103,36 @@ namespace MailAssistant.Forms
                 }
             }
         }
+        private void ShowTodayMails_Click(object sender, EventArgs e) => SetUSerMessage(messages.Where(m => m.Date.Day == DateTime.Today.Day && m.Date.Year == DateTime.Today.Year && m.Date.Month == DateTime.Today.Month).ToList());
+        private void ShowAllMails_Click(object sender, EventArgs e) => SetUSerMessage(messages);
+        private void ShowWithoutMails_Click(object sender, EventArgs e)
+        {
+            new TakeEmailForm(true).Show(this);
+        }
+        private void ShowFromMails_Click(object sender, EventArgs e)
+        {
+            new TakeEmailForm(false).Show(this);
+        }
+        public void FindSender(string email)
+        {
+            SetUSerMessage(messages.Where(m => m.From.Email.Contains(email)).ToList());
+        }
+        public void FindRecipient(string email)
+        {
+            SetUSerMessage(messages.Where(m => m.To[0].Email.Contains(email)).ToList());
+        }
+        private void SetUSerMessage(List<ActiveUp.Net.Mail.Message> findMessages)
+        {
+            if (findMessages.Count > 0)
+            {
+                MessagedataGrid.Rows.Clear();
+                foreach (ActiveUp.Net.Mail.Message email in findMessages)
+                {
+                    MessagedataGrid.Rows.Add(email.From.Email, email.To[0].Email, email.Date.ToString(), email.BodyText.Text);
+                }
+            }
+            else MessageBox.Show("Сообщений удовлетворяющих ваш запрос, нет","Увидовление");
+        }
         private void GetUSerMessage(object obj)
         {
             UserMail userMail = (UserMail)obj;
@@ -91,31 +143,45 @@ namespace MailAssistant.Forms
                                     userMail.Login,
                                     userMail.Pass
                                 );
-            var emailList = mailRepository.GetAllMails("inbox");
+            IEnumerable<ActiveUp.Net.Mail.Message> emailList;
+            if(whatLetters == "Все") emailList = mailRepository.GetAllMails("inbox");
+            else emailList = mailRepository.GetUnreadMails("inbox");
+            
             MutexObj.WaitOne();
             messages.AddRange(emailList);
-            /*foreach (ActiveUp.Net.Mail.Message email in emailList)
-            {
-                MessagedataGrid.Rows.Add(email.Date, email.From, email.BodyText.Text);
-            }*/
-            /*await Task.Run(() => */SetInformUSerMessage();
+            
+            SetInformUSerMessage();
             MutexObj.ReleaseMutex();
+        }
+        private void CreateTreadsLoadMessage()
+        {
+            Thread get;
+            foreach (var item in userMails)
+            {
+                get = new Thread(new ParameterizedThreadStart(GetUSerMessage));
+                get.Start(item);
+            }
         }
         private void UpdateMails_Click(object sender, EventArgs e)
         {
             messages.Clear();
             if (userMails.Count > 0)
             {
-                Thread get;
-                foreach (var item in userMails)
-                {
-                    get = new Thread(new ParameterizedThreadStart(GetUSerMessage));
-                    get.Start(item);
-                }
+                whatLetters = "Все";
+                CreateTreadsLoadMessage();
             }
             else MessageBox.Show("Программа не может нормально функционировать.\nНет ни одной зарегистрированой почты","Ошибка");
         }
-
+        private void NewMails_Click(object sender, EventArgs e)
+        {
+            messages.Clear();
+            if (userMails.Count > 0)
+            {
+                whatLetters = "Новые";
+                CreateTreadsLoadMessage();
+            }
+            else MessageBox.Show("Программа не может нормально функционировать.\nНет ни одной зарегистрированой почты", "Ошибка");
+        }
         private void MessagedataGrid_DoubleClick(object sender, EventArgs e)
         {
             try
