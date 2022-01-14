@@ -48,7 +48,7 @@ namespace MailAssistant.Forms
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.MessageWebBrowser);
             this.Name = "HTMLMessageForm";
-            this.Text = "HTMLMessageForm";
+            this.Text = "Лист";
             this.ResumeLayout(false);
 
         }

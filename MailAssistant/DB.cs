@@ -52,7 +52,7 @@ namespace MailAssistant
             try
             {
                 conn.Open();
-                query = $"INSERT INTO mailaccounts (login, pass) VALUES(\"{login}\",\"{pass}\");";
+                query = $"INSERT INTO mailaccounts (login, pass) VALUES(\"{UserMail.Encrypt(login)}\",\"{UserMail.Encrypt(pass)}\");";
 
                 MySqlCommand command = new MySqlCommand(query, conn);
                 command.ExecuteNonQuery();
@@ -65,8 +65,10 @@ namespace MailAssistant
             finally
             {
                 //закрываем соединение
-                conn.Close();
-                conn.Dispose();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
             }
         }
         public void LoadUsers(ref List<UserMail> userMails)
@@ -84,7 +86,7 @@ namespace MailAssistant
 
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    userMails.Add(new UserMail(row[0].ToString(), row[1].ToString(), row[2].ToString()));
+                    userMails.Add(new UserMail(row[0].ToString(), row[1].ToString(), row[2].ToString(),0));
                 }
             }
             catch (SqlException se)
@@ -94,7 +96,10 @@ namespace MailAssistant
             finally
             {
                 //закрываем соединение
-                conn.Close();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
             }
         }
         public void UpdateUsers(UserMail userMail)
@@ -102,7 +107,7 @@ namespace MailAssistant
             try
             {
                 conn.Open();
-                query = $"UPDATE mailaccounts SET login = '{userMail.Login}', pass = '{userMail.Pass}' WHERE id = {userMail.Id}; ";
+                query = $"UPDATE mailaccounts SET login = '{UserMail.Encrypt(userMail.Login)}', pass = '{UserMail.Encrypt(userMail.Pass)}' WHERE id = {userMail.Id}; ";
 
                 MySqlCommand command = new MySqlCommand(query, conn);
                 command.ExecuteNonQuery();
@@ -139,7 +144,10 @@ namespace MailAssistant
             finally
             {
                 //закрываем соединение
-                conn.Close();
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
             }
         }
     }

@@ -48,14 +48,13 @@ namespace MailAssistant.Forms
                 if (add)
                 {
                     MailForm MF = (MailForm)this.Owner;
-                    //MF.userMails.Add(new UserMail(LoginTextBox.Text, PassTextBox.Text));
                     MF.db.AddUsers(LoginTextBox.Text,PassTextBox.Text);
                     MF.LoadMailAccount();
                 }
                 else
                 {
                     ChangeUserMail Change = (ChangeUserMail)this.Owner;
-                    Change.UpdateUserMail(new UserMail(userMail.Id, LoginTextBox.Text, PassTextBox.Text),index);
+                    Change.UpdateUserMail(new UserMail(userMail.Id, LoginTextBox.Text, PassTextBox.Text, 2),index);
                 }
                 this.Close();
             }

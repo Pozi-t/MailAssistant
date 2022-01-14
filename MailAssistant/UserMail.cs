@@ -17,24 +17,16 @@ namespace MailAssistant
         {
             get
             {
-                SecureString temp = DecryptString(login);
-                string readable = ToInsecureString(temp);
                 return login;
-                //return readable;
             }
-            //set => login = EncryptString(ToSecureString(value));
             set => login = value;
         }
         public string Pass
         {
             get
             {
-                SecureString temp = DecryptString(pass);
-                string readable = ToInsecureString(temp);
-                //return readable;
                 return pass;
             }
-            //set => pass = EncryptString(ToSecureString(value));
             set => pass = value;
         }
         public string Id
@@ -49,11 +41,24 @@ namespace MailAssistant
             }
         }
         UserMail() { }
-        public UserMail(string id, string login, string pass)
+        public UserMail(string id, string login, string pass, int state)
         {
             Id = id;
-            Login = login;
-            Pass = pass;
+            if (state == 0)
+            {
+                Login = Decrypt(login);
+                Pass = Decrypt(pass);
+            }
+            else if (state == 1)
+            {
+                Login = Encrypt(login);
+                Pass = Encrypt(pass);
+            }
+            else
+            {
+                Login = login;
+                Pass = pass;
+            }
         }
         public UserMail(UserMail userMail)
         {
@@ -61,51 +66,48 @@ namespace MailAssistant
             Login = userMail.Login;
             Pass = userMail.Pass;
         }
-        static byte[] entropy = Encoding.Unicode.GetBytes("SaLtY bOy 6970 ePiC");
 
-        public static string EncryptString(SecureString input)
+        private static readonly string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        private const string password = "password";
+        //генерация повторяющегося пароля
+        private static string GetRepeatKey(string s, int n)
         {
-            byte[] encryptedData = ProtectedData.Protect(Encoding.Unicode.GetBytes(ToInsecureString(input)), entropy, DataProtectionScope.CurrentUser);
-            return Convert.ToBase64String(encryptedData);
+            var p = s;
+            while (p.Length < n)
+            {
+                p += p;
+            }
+
+            return p.Substring(0, n);
         }
 
-        public static SecureString DecryptString(string encryptedData)
+        private static string Vigenere(string text, bool encrypting = true)
         {
-            try
+            var gamma = GetRepeatKey(password, text.Length);
+            var retValue = "";
+            var q = letters.Length;
+
+            for (int i = 0; i < text.Length; i++)
             {
-                byte[] decryptedData = ProtectedData.Unprotect(Convert.FromBase64String(encryptedData), entropy, DataProtectionScope.CurrentUser);
-                return ToSecureString(Encoding.Unicode.GetString(decryptedData));
+                var letterIndex = letters.IndexOf(text[i]);
+                var codeIndex = letters.IndexOf(gamma[i]);
+                if (letterIndex < 0)
+                {
+                    //если буква не найдена, добавляем её в исходном виде
+                    retValue += text[i].ToString();
+                }
+                else
+                {
+                    retValue += letters[(q + letterIndex + ((encrypting ? 1 : -1) * codeIndex)) % q].ToString();
+                }
             }
-            catch
-            {
-                return new SecureString();
-            }
+            return retValue;
         }
 
-        public static SecureString ToSecureString(string input)
-        {
-            SecureString secure = new SecureString();
-            foreach (char c in input)
-            {
-                secure.AppendChar(c);
-            }
-            secure.MakeReadOnly();
-            return secure;
-        }
+        //шифрование текста
+        public static string Encrypt(string plainMessage) { return Vigenere(plainMessage); }
 
-        public static string ToInsecureString(SecureString input)
-        {
-            string returnValue = string.Empty;
-            IntPtr ptr = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(input);
-            try
-            {
-                returnValue = System.Runtime.InteropServices.Marshal.PtrToStringBSTR(ptr);
-            }
-            finally
-            {
-                System.Runtime.InteropServices.Marshal.ZeroFreeBSTR(ptr);
-            }
-            return returnValue;
-        }
+        //дешифрование текста
+        public static string Decrypt(string encryptedMessage) { return Vigenere(encryptedMessage, false); }
     }
 }

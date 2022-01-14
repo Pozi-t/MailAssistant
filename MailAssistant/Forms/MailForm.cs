@@ -24,8 +24,6 @@ namespace MailAssistant.Forms
         public MailForm()
         {
             InitializeComponent();
-            /*if (File.Exists("userMails.xml")) DB.Load(out userMails);
-            else userMails = new List<UserMail>();*/
             MutexObj = new Mutex();
             userMails = new List<UserMail>();
             messages = new List<ActiveUp.Net.Mail.Message>();
@@ -195,13 +193,6 @@ namespace MailAssistant.Forms
                     sw.WriteLine(messages[index].BodyHtml.Text);
                 }
 
-                /*using (FileStream fstream = new FileStream(path, FileMode.OpenOrCreate))
-                {
-                    // преобразуем строку в байты
-                    byte[] array = System.Text.Encoding.Default.GetBytes(messages[index].BodyHtml.Text);
-                    // запись массива байтов в файл
-                    fstream.Write(array, 0, array.Length);
-                }*/
                 new HTMLMessageForm(Path.GetFullPath(path)).Show(this);
 
             }
